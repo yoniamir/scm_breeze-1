@@ -171,7 +171,13 @@ _print_path() {
 exec_scmb_expand_args() {
   local args
   eval "args=$(scmb_expand_args "$@")"  # populate $args array
-  _safe_eval "${args[@]}"
+  # Fall back to direct execution if _safe_eval isn't available
+  # (e.g., in non-interactive shells or tools like Claude Code)
+  if type _safe_eval > /dev/null 2>&1; then
+    _safe_eval "${args[@]}"
+  else
+    "${args[@]}"
+  fi
 }
 
 # Clear numbered env variables
